@@ -5,7 +5,7 @@ from werkzeug.utils import secure_filename
  
 app = Flask(__name__)
  
-UPLOAD_FOLDER = '/Users/shreyas/code/webdev/SIH_experimentation/image_input/static/uploads'
+UPLOAD_FOLDER = 'C:\\SIH_Tapash\\SIH_TAPASH\\image_input\\static\\uploads'
  
 app.secret_key = "secret key"
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -40,7 +40,7 @@ def upload_image():
     else:
         flash('Allowed image types are - png, jpg, jpeg, gif')
         return redirect(request.url)
- 
+
 @app.route('/display/<filename>')
 def display_image(filename):
     #print('display_image filename: ' + filename)
