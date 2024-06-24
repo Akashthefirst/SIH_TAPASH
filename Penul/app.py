@@ -3,29 +3,25 @@ import urllib.request
 import os
 from werkzeug.utils import secure_filename
 from PIL import Image
-import pickle
 import torch
 from torch import nn
 from torchvision import transforms
- 
+
 device = "cpu"
 
 app = Flask(__name__)
 
-#model = pickle.load(open('mashup/model/fashionmnist_model.pkl', 'rb'))
-
 UPLOAD_FOLDER = 'C:\\SIH_Tapash\\SIH_TAPASH\\Penul\\static\\uploads'
- 
+
 app.secret_key = "secret key"
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
- 
+
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
- 
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-     
- 
+
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -40,6 +36,21 @@ disease_names = {
     6: "vascular lesions",
     7: "pigmented benign keratosis"
 }
+
+def find_max(values):
+    max_value = values[0]
+    for value in values:
+        if value.item() > max_value.item():
+            max_value = value
+    return max_value
+
+def find_second_highest(values):
+    highest_value = max(values, key=lambda x: x.item())
+    second_highest_value = None
+    for value in values:
+        if value != highest_value and (second_highest_value is None or value.item() > second_highest_value.item()):
+            second_highest_value = value
+    return second_highest_value
 
 class ModelFunction(nn.Module):
     def __init__(self):
@@ -84,8 +95,7 @@ class ModelFunction(nn.Module):
 
     def forward(self, x):
         return self.model(x)
-    
-    
+
 model = ModelFunction()
 model.load_state_dict(torch.load('C:\\SIH_Tapash\\SIH_TAPASH\\Penul\\model\\skind.pth', map_location=torch.device('cpu')))
 
@@ -96,15 +106,17 @@ def preprocess(image_path):
         transforms.ToTensor()
     ])
     transformed_image = data_transform(img)
-    transformed_image = transformed_image.permute(1,2,0)
-    final_image = torch.stack([transformed_image,transformed_image]).permute(0,3,1,2)
+    transformed_image = transformed_image.unsqueeze(0)  # Add batch dimension
     with torch.inference_mode():
         model.eval()
-        outputs=model(final_image)
-        _, predicted=torch.max(outputs,1)
-        ind=predicted[0].item()
-    return disease_names[ind]
-
+        outputs = model(transformed_image)
+        _, predicted = torch.max(outputs, 1)
+        ind = predicted[0].item()
+        maxi = find_max(outputs[0])
+        secondmaxi = find_second_highest(outputs[0])
+        if maxi.item() - secondmaxi.item() > 0.5:
+            return disease_names[ind]
+        return "Model is unsure, please see a doctor."
 
 @app.route('/', methods=['POST'])
 def upload_image():
@@ -120,19 +132,18 @@ def upload_image():
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(file_path)
         flash('Image successfully uploaded and displayed below')
-        
+
         # Call the preprocess function with the uploaded image path
         prediction = preprocess(file_path)
-        
+
         return render_template('index.html', filename=filename, prediction=prediction)
     else:
         flash('Allowed image types are - png, jpg, jpeg, gif')
         return redirect(request.url)
- 
+
 @app.route('/display/<filename>')
 def display_image(filename):
-    #print('display_image filename: ' + filename)
     return redirect(url_for('static', filename='uploads/' + filename), code=301)
- 
+
 if __name__ == "__main__":
     app.run()
