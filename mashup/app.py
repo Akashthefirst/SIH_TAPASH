@@ -14,7 +14,7 @@ app = Flask(__name__)
 
 #model = pickle.load(open('mashup/model/fashionmnist_model.pkl', 'rb'))
 
-UPLOAD_FOLDER = 'C:\\SIH_Tapash\\SIH_TAPASH\\mashup\\static\\uploads'
+UPLOAD_FOLDER = 'D:\\SIH_TAPASH\\SIH_TAPASH\\mashup\\static\\uploads'
  
 app.secret_key = "secret key"
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -78,7 +78,7 @@ class FashionMNISTModelV2(nn.Module):
         return x
     
 model_0 = FashionMNISTModelV2(input_shape=1, hidden_units=10, output_shape=10) 
-model_0.load_state_dict(torch.load('mashup/model/mnistfashion2.pth'))
+model_0.load_state_dict(torch.load('D:\SIH_TAPASH\SIH_TAPASH\mashup\model\mnistfashion2.pth'))
 
 def make_predictions(model: torch.nn.Module, data: list, device: torch.device = device):
     pred_probs = []
