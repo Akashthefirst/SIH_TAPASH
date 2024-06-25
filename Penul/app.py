@@ -219,7 +219,7 @@ def upload_image():
         # Call the preprocess function with the uploaded image path
         prediction = preprocess(file_path)
 
-        return render_template('first_page.html', filename=filename, prediction=prediction)
+        return render_template('index2.ejs', filename=filename, prediction=prediction)
     else:
         flash('Allowed image types are - png, jpg, jpeg, gif')
         return redirect(request.url)
