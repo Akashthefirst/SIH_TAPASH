@@ -90,6 +90,12 @@ def login():
 def dashboard():
     return render_template('index2.ejs')
 
+@app.route('/logout', methods=['GET', 'POST'])
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
+
 @app.route('/register',  methods=['GET', 'POST'])
 def register():
     form=Registerform()
@@ -107,6 +113,10 @@ def register():
 @app.route('/about')
 def about():
     return render_template('about.ejs')
+
+@app.route('/upload')
+def upload():
+    return render_template('upload.html')
 
 
 disease_names = {
@@ -219,7 +229,7 @@ def upload_image():
         # Call the preprocess function with the uploaded image path
         prediction = preprocess(file_path)
 
-        return render_template('index2.ejs', filename=filename, prediction=prediction)
+        return render_template('upload.html', filename=filename, prediction=prediction)
     else:
         flash('Allowed image types are - png, jpg, jpeg, gif')
         return redirect(request.url)

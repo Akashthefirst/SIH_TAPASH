@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload File</title>
+</head>
+<body>
+    <div class="row">
+        <h2>Select a file to upload</h2>
+        <p>
+            {% with messages = get_flashed_messages() %}
+              {% if messages %}
+                <ul>
+                {% for message in messages %}
+                  <li>{{ message }}</li>
+                {% endfor %}
+                </ul>
+              {% endif %}
+            {% endwith %}
+        </p>
+        {% if filename %}
+        {% endif %}
+        <form method="post" action="/" enctype="multipart/form-data">
+            <dl>
+                <p>
+                    <input type="file" name="file" class="form-control" autocomplete="off" required>
+                </p>
+            </dl>
+            <p>
+                <input type="submit" value="Submit" class="btn btn-info">
+            </p>
+        </form>
+        {% if prediction %}
+        <p>Prediction: {{ prediction }}</p>
+        {% endif %}
+        <!-- <div class="lg:w-3/5 relative"><figure class="z-10 relative m-0"><img class="animate-floating" src="{{ url_for('static', filename='logo_dermis.png') }}" alt="The best dermatology artificial intelligence for doctors"></figure><figure class="absolute mb-9 pb-9 pr-9 bottom-0 right-0 animate-floating"><svg xmlns="http://www.w3.org/2000/svg" width="93.171" height="215.041" viewBox="0 0 93.171 215.041" alt="line"><defs><linearGradient id="a" y1="0.5" x2="1" y2="0.5" gradientUnits="objectBoundingBox"><stop offset="0" stop-color="#8671ff"></stop><stop offset="1" stop-color="#8671ff" stop-opacity="0"></stop></linearGradient></defs><rect width="222.188" height="18.281" rx="9" transform="rotate(-70 149.09 104.394)" fill="url(#a)"></rect></svg></figure></div> -->
+    </div>
+</body>
+</html>
