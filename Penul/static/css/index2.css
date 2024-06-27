@@ -6,8 +6,9 @@ body{
 
 #logo{
     height: 67px;
-    width: 93px;
+    width: 60px;
     animation: 6s ease-in-out infinite e;
+    /* background-color: #f8f9fa; */
 }
 
 .image-container {
@@ -63,7 +64,7 @@ body{
     margin-right: 330px;
     margin-left: 0;
     font-size: 40px;
-    background: linear-gradient(to right, blue, rgb(144, 19, 163));
+    background: linear-gradient(to right, blue, #9013a3);
     -webkit-background-clip: text;
     color: transparent;
     font-weight: 600;
