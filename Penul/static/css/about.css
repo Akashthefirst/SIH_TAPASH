@@ -1,0 +1,21 @@
+::-webkit-scrollbar {
+    display: none;
+  }
+  html, body {
+    height: 100%;
+    margin: 0;
+    scroll-snap-type: y mandatory;
+    overflow-y: scroll;
+    scroll-behavior: smooth;
+  }
+  section {
+    height: 100vh;
+    scroll-snap-align: start;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2em;
+  }
+  #section1 { background-color: lightcoral; }
+  #section2 { background-color: lightblue; }
+  #section3 { background-color: lightgreen; }

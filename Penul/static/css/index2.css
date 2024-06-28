@@ -4,6 +4,10 @@ body{
     font-weight: 500;
 }
 
+::-webkit-scrollbar {
+    display: none;
+  }
+
 #logo{
     height: 67px;
     width: 60px;
@@ -95,4 +99,43 @@ body{
     padding: 20px;
     width: 250px;
     border-radius: 20px;
+}
+
+.footer {
+    background-color: #7c2abbe4;
+    color: white;
+    padding: 20px 0;
+    /* text-align: center; */
+    margin-top: 60px;
+    height: 270px;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10%;
+}
+
+.footer-logo {
+    font-size: 32px;
+    font-weight: bold;
+    margin-top: 50px;
+    padding-left: 40px;
+}
+
+.footer-links a {
+    color: white;
+    margin: 0 45px;
+    text-decoration: none;
+}
+
+.footer-links a:hover {
+    text-decoration: underline;
+}
+
+.footer-bottom {
+    margin-top: 95px;
+    margin-left: 200px;
+    font-size: 14px;
 }

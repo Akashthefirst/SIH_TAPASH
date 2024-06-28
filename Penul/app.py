@@ -112,7 +112,7 @@ def register():
 
 @app.route('/about')
 def about():
-    return render_template('about.ejs')
+    return render_template('about.html')
 
 @app.route('/upload')
 def upload():
