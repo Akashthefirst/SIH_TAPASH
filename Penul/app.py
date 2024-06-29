@@ -118,6 +118,10 @@ def about():
 def upload():
     return render_template('upload.html')
 
+@app.route('/tnc')
+def tnc():
+    return render_template('tnc.html')
+
 
 disease_names = {
     0: "melanoma",
