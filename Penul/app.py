@@ -88,7 +88,7 @@ def login():
 @app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
-    return render_template('index2.ejs')
+    return render_template('index.html')
 
 @app.route('/logout', methods=['GET', 'POST'])
 @login_required
