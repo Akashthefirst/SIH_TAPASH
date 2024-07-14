@@ -19,7 +19,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'thisisasecretkey'
-app.config['UPLOAD_FOLDER'] = 'D:\\SIH_TAPASH\\SIH_TAPASH\\Penul\\static\\uploads'
+app.config['UPLOAD_FOLDER'] = 'C:\\SIH_Tapash\\SIH_TAPASH-1\\Penul\\static\\uploads'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
 db = SQLAlchemy(app)
@@ -190,7 +190,7 @@ class ModelFunction(nn.Module):
         return self.model(x)
 
 model = ModelFunction()
-model.load_state_dict(torch.load('D:\\SIH_TAPASH\\SIH_TAPASH\\Penul\\model\\skind.pth', map_location=torch.device('cpu')))
+model.load_state_dict(torch.load('C:\\SIH_Tapash\\SIH_TAPASH-1\\Penul\\model\\skind.pth', map_location=torch.device('cpu')))
 
 def preprocess(image_path):
     img = Image.open(image_path)
