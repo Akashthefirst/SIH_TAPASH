@@ -88,7 +88,7 @@ def login():
 @app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
-    return render_template('index2.ejs')
+    return render_template('index.html')
 
 @app.route('/logout', methods=['GET', 'POST'])
 @login_required
@@ -117,6 +117,10 @@ def about():
 @app.route('/upload')
 def upload():
     return render_template('upload.html')
+
+@app.route('/tnc')
+def tnc():
+    return render_template('tnc.html')
 
 
 disease_names = {
