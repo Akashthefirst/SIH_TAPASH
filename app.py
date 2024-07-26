@@ -12,6 +12,142 @@ from PIL import Image
 import torch
 from torch import nn
 from torchvision import transforms
+from transformers import pipeline
+
+
+#-------------------------------------------------------------------------------MODEL-------------------------------------------------------------------------
+#------------------------------------TRANSFORMERS PIPELINES----------------------------------------------
+pipe_76 = pipeline("image-classification", model="shreyasguha/22class_skindiseases_76acc_possibleoverfit")
+pipe_57 = pipeline("image-classification", model="shreyasguha/22class_skindiseases_57acc")
+pipe_80 = pipeline("image-classification", model="shreyasguha/22class_skindiseases_80acc")
+
+categories = [
+    "Seborrheic Keratoses and other Benign Tumors",
+    "Vascular Tumors",
+    "Light Diseases and Disorders of Pigmentation",
+    "Vasculitis Photos",
+    "Cellulitis Impetigo and other Bacterial Infections",
+    "Tinea Ringworm Candidiasis and other Fungal Infections",
+    "Nail Fungus and other Nail Disease",
+    "Exanthems and Drug Eruptions",
+    "Systemic Disease",
+    "Acne and Rosacea Photos",
+    "Actinic Keratosis Basal Cell Carcinoma and other Malignant Lesions",
+    "Lupus and other Connective Tissue diseases",
+    "Hair Loss Photos Alopecia and other Hair Diseases",
+    "Melanoma Skin Cancer Nevi and Moles",
+    "Eczema Photos",
+    "Warts Molluscum and other Viral Infections",
+    "Scabies Lyme Disease and other Infestations and Bites",
+    "Bullous Disease Photos",
+    "Poison Ivy Photos and other Contact Dermatitis",
+    "Atopic Dermatitis Photos",
+    "Psoriasis pictures Lichen Planus and related diseases",
+    "Urticaria Hives",
+    "Herpes HPV and other STDs Photos"
+]
+
+def preprocess(image_path, mix=False):
+    image = Image.open(image_path)
+    ans1 = pipe_57(image)
+    ans2 = pipe_76(image)
+    ans3 = pipe_80(image)
+
+    op = [ans1, ans2, ans3]
+    s = [ans[0]['label'] for ans in op]
+    ansf = [int(element.replace("LABEL_", "")) for element in s]
+    conditions = [categories[ans] for ans in ansf]
+
+    if(conditions[0] == conditions[1] and conditions[1] == conditions[2]):
+        return conditions[0]
+    if((conditions[0] != conditions[1] and conditions[1] != conditions[2]) or mix==False):
+        return conditions[1]
+    else:
+        if(conditions[0] == conditions[1]):
+            return conditions[0]
+        elif(conditions[0] == conditions[2]):
+            return conditions[0]
+        else:
+            return conditions[1]
+
+
+#------------------------------------PREVIOUS MODEL-----------------------------------
+# disease_names = {
+#     0: "melanoma",
+#     1: "benign keratosis-like lesions",
+#     2: "basal cell carcinoma",
+#     3: "actinic keratoses",
+#     4: "squamous cell carcinoma",
+#     5: "dermatofibroma",
+#     6: "vascular lesions",
+#     7: "pigmented benign keratosis"
+# }
+# class ModelFunction(nn.Module):
+#     def __init__(self):
+#         super(ModelFunction, self).__init__()
+#         self.model = nn.Sequential(
+#             # Convolutional layers
+#             nn.Conv2d(3, 32, kernel_size=3, padding=1),  # input_shape=(3, 28, 28) because PyTorch expects (channels, height, width)
+#             nn.ReLU(),
+#             nn.MaxPool2d(kernel_size=2, stride=2),
+#             nn.BatchNorm2d(32),
+#             nn.Conv2d(32, 64, kernel_size=3, padding=1),
+#             nn.ReLU(),
+#             nn.Conv2d(64, 64, kernel_size=3, padding=1),
+#             nn.ReLU(),
+#             nn.MaxPool2d(kernel_size=2, stride=2),
+#             nn.BatchNorm2d(64),
+#             nn.Conv2d(64, 128, kernel_size=3, padding=1),
+#             nn.ReLU(),
+#             nn.Conv2d(128, 128, kernel_size=3, padding=1),
+#             nn.ReLU(),
+#             nn.MaxPool2d(kernel_size=2, stride=2),
+#             nn.BatchNorm2d(128),
+#             nn.Conv2d(128, 256, kernel_size=3, padding=1),
+#             nn.ReLU(),
+#             nn.Conv2d(256, 256, kernel_size=3, padding=1),
+#             nn.ReLU(),
+#             nn.MaxPool2d(kernel_size=2, stride=2),
+#             nn.Flatten(),
+#             nn.Dropout(p=0.2),
+#             nn.Linear(256 * 1 * 1, 128),  # Adjust the input size here based on the final output size of the conv layers
+#             nn.ReLU(),
+#             nn.BatchNorm1d(128),
+#             nn.Linear(128, 64),
+#             nn.ReLU(),
+#             nn.BatchNorm1d(64),
+#             nn.Linear(64, 32),
+#             nn.ReLU(),
+#             nn.BatchNorm1d(32),
+#             nn.Linear(32, 7),
+#             nn.Softmax(dim=1)
+#         )
+
+#     def forward(self, x):
+#         return self.model(x)
+
+# model = ModelFunction()
+# model.load_state_dict(torch.load('/Users/shreyasguha/Downloads/Shreyas/code/SIH_TAPASH/model/skind.pth', map_location=torch.device('cpu')))
+
+# def preprocess(image_path):
+#     img = Image.open(image_path)
+#     data_transform = transforms.Compose([
+#         transforms.Resize(size=(28, 28)),
+#         transforms.ToTensor()
+#     ])
+#     transformed_image = data_transform(img)
+#     transformed_image = transformed_image.unsqueeze(0)  # Add batch dimension
+#     with torch.inference_mode():
+#         model.eval()
+#         outputs = model(transformed_image)
+#         _, predicted = torch.max(outputs, 1)
+#         ind = predicted[0].item()
+#         maxi = find_max(outputs[0])
+#         secondmaxi = find_second_highest(outputs[0])
+#         if maxi.item() - secondmaxi.item() > 0.5:
+#             return disease_names[ind]
+#         return "Model is unsure, please see a doctor."
+#-----------------------------------------------------------------------------------------------------------------------------------------------------------
 
 device = "cpu"
 
@@ -19,8 +155,8 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'thisisasecretkey'
-app.config['UPLOAD_FOLDER'] = 'C:\\SIH_Tapash\\SIH_TAPASH-1\\Penul\\static\\uploads'
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+app.config['UPLOAD_FOLDER'] = '/Users/shreyasguha/Downloads/Shreyas/code/SIH_TAPASH/static/uploads'
+app.config['MAX_CONTENT_LENGTH'] = 200 * 1024 * 1024
 
 db = SQLAlchemy(app)
 
@@ -64,8 +200,9 @@ class Loginform(FlaskForm):
 app.secret_key = "secret key"
 # app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 # app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+# app.config['MAX_CONTENT_LENGTH'] = 200 * 1024 * 1024
 
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif', 'webp'])
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -123,16 +260,7 @@ def tnc():
     return render_template('tnc.html')
 
 
-disease_names = {
-    0: "melanoma",
-    1: "benign keratosis-like lesions",
-    2: "basal cell carcinoma",
-    3: "actinic keratoses",
-    4: "squamous cell carcinoma",
-    5: "dermatofibroma",
-    6: "vascular lesions",
-    7: "pigmented benign keratosis"
-}
+
 
 def find_max(values):
     max_value = values[0]
@@ -149,71 +277,7 @@ def find_second_highest(values):
             second_highest_value = value
     return second_highest_value
 
-class ModelFunction(nn.Module):
-    def __init__(self):
-        super(ModelFunction, self).__init__()
-        self.model = nn.Sequential(
-            # Convolutional layers
-            nn.Conv2d(3, 32, kernel_size=3, padding=1),  # input_shape=(3, 28, 28) because PyTorch expects (channels, height, width)
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2),
-            nn.BatchNorm2d(32),
-            nn.Conv2d(32, 64, kernel_size=3, padding=1),
-            nn.ReLU(),
-            nn.Conv2d(64, 64, kernel_size=3, padding=1),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2),
-            nn.BatchNorm2d(64),
-            nn.Conv2d(64, 128, kernel_size=3, padding=1),
-            nn.ReLU(),
-            nn.Conv2d(128, 128, kernel_size=3, padding=1),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2),
-            nn.BatchNorm2d(128),
-            nn.Conv2d(128, 256, kernel_size=3, padding=1),
-            nn.ReLU(),
-            nn.Conv2d(256, 256, kernel_size=3, padding=1),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2),
-            nn.Flatten(),
-            nn.Dropout(p=0.2),
-            nn.Linear(256 * 1 * 1, 128),  # Adjust the input size here based on the final output size of the conv layers
-            nn.ReLU(),
-            nn.BatchNorm1d(128),
-            nn.Linear(128, 64),
-            nn.ReLU(),
-            nn.BatchNorm1d(64),
-            nn.Linear(64, 32),
-            nn.ReLU(),
-            nn.BatchNorm1d(32),
-            nn.Linear(32, 7),
-            nn.Softmax(dim=1)
-        )
 
-    def forward(self, x):
-        return self.model(x)
-
-model = ModelFunction()
-model.load_state_dict(torch.load('C:\\SIH_Tapash\\SIH_TAPASH-1\\Penul\\model\\skind.pth', map_location=torch.device('cpu')))
-
-def preprocess(image_path):
-    img = Image.open(image_path)
-    data_transform = transforms.Compose([
-        transforms.Resize(size=(28, 28)),
-        transforms.ToTensor()
-    ])
-    transformed_image = data_transform(img)
-    transformed_image = transformed_image.unsqueeze(0)  # Add batch dimension
-    with torch.inference_mode():
-        model.eval()
-        outputs = model(transformed_image)
-        _, predicted = torch.max(outputs, 1)
-        ind = predicted[0].item()
-        maxi = find_max(outputs[0])
-        secondmaxi = find_second_highest(outputs[0])
-        if maxi.item() - secondmaxi.item() > 0.5:
-            return disease_names[ind]
-        return "Model is unsure, please see a doctor."
 
 @app.route('/', methods=['POST'])
 def upload_image():
