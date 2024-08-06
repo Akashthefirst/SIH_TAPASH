@@ -14,7 +14,6 @@ from torch import nn
 from torchvision import transforms
 from transformers import pipeline
 
-
 #-------------------------------------------------------------------------------MODEL-------------------------------------------------------------------------
 #------------------------------------TRANSFORMERS PIPELINES----------------------------------------------
 pipe_76 = pipeline("image-classification", model="shreyasguha/22class_skindiseases_76acc_possibleoverfit")
@@ -155,7 +154,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'thisisasecretkey'
-app.config['UPLOAD_FOLDER'] = '/Users/shreyasguha/Downloads/Shreyas/code/SIH_TAPASH/static/uploads'
+app.config['UPLOAD_FOLDER'] = 'C:\\Users\\maste\\OneDrive\\Desktop\\ASAP-1\\SIH_TAPASH\\static\\uploads'
 app.config['MAX_CONTENT_LENGTH'] = 200 * 1024 * 1024
 
 db = SQLAlchemy(app)
@@ -307,4 +306,4 @@ def upload_image():
 #     return redirect(url_for('static', filename='uploads/' + filename), code=301)
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host="0.0.0.0", port=5000)
